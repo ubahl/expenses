@@ -1,0 +1,75 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: "acm-expenses\nkeep track of all acm expenses \n"
+Globals:
+  Function:
+    Timeout: 5
+    AutoPublishAlias: live
+    DeploymentPreference:
+      Type: Linear10PercentEvery1Minute
+Resources:
+  ExpenseFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-bucket-2/a45e362cb45f70262dc10bcdd935775a
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Events:
+        Post:
+          Type: Api
+          Properties:
+            Path: /reimburse
+            Method: POST
+            RestApiId:
+              Ref: ExpenseApi
+      Policies:
+      - AWSLambdaVPCAccessExecutionRole
+      - AmazonDynamoDBFullAccess
+      - Version: '2012-10-17'
+        Statement:
+        - Sid: Stmt1467321765000
+          Effect: Allow
+          Action:
+          - apigateway:*
+          Resource:
+          - '*'
+  ApiGatewayInvokeLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+        - ExpenseFunction
+        - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+        - ''
+        - - 'arn:aws:execute-api:'
+          - Ref: AWS::Region
+          - ':'
+          - Ref: AWS::AccountId
+          - ':'
+          - Ref: ExpenseApi
+          - /*/*/*
+  ExpenseApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: stage1
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ReimbursementsTable
+      AttributeDefinitions:
+      - AttributeName: ReimbursementSeeker
+        AttributeType: S
+      - AttributeName: DateAdded
+        AttributeType: S
+      KeySchema:
+      - AttributeName: ReimbursementSeeker
+        KeyType: HASH
+      - AttributeName: DateAdded
+        KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: '10'
+        WriteCapacityUnits: '10'

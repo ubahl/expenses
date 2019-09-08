@@ -25,25 +25,25 @@ def lambda_handler(event, context):
         "isBase64Encoded": True,
         "statusCode": 0,
         "headers": {"headerName": "headerValue"},
-        "body": "..."
+        "body": ""
     }
 
-    body = event['body']
+    body = event["body"]
 
     # get all the information from the HTTP request
 
-    revent = body['event']
-    rperson = body['person']
+    revent = body["event"]
+    rperson = body["person"]
     remail = personToEmail[rperson]  # include a check if the wrong name is inputted
     rnumber = personToNumber[rperson]  # include a check
-    dateOfPurchase = body['dateOfPurchase']
-    totalAmount = body['totalAmount']
-    description = body['description']
-    other = body['other']
+    dateOfPurchase = body["dateOfPurchase"]
+    totalAmount = body["totalAmount"]
+    description = body["description"]
+    other = body["other"]
 
 
     item = {
-        'ReimbursementSeeker': rperson
+        'ReimbursementSeeker': rperson,
         'DateAdded': str(datetime.datetime.now()),
         'Reimbursed': "no",
         'DateOfPurchase': dateOfPurchase,
