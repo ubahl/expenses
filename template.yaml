@@ -40,9 +40,6 @@ Resources:
                             - apigateway:*
                         Resource:
                              - "*"
-            Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
-                Variables:
-                    PARAM1: VALUE
 
     ApiGatewayInvokeLambdaPermission:
         Type: "AWS::Lambda::Permission"
@@ -65,5 +62,23 @@ Resources:
         Type: AWS::Serverless::Api
         Properties:
             StageName: stage1
+
+    DynamoDBTable:
+        Type: AWS::DynamoDB::Table
+        Properties:
+            TableName: "ReimbursementsTable"
+            AttributeDefinitions:
+                - AttributeName: "ReimbursementSeeker"
+                  AttributeType: "S"
+                - AttributeName: "DateAdded"
+                  AttributeType: "S"
+            KeySchema:
+                - AttributeName: "ReimbursementSeeker"
+                  KeyType: "HASH"
+                - AttributeName: "DateAdded"
+                  KeyType: "RANGE"
+            ProvisionedThroughput:
+                ReadCapacityUnits: "10"
+                WriteCapacityUnits: "10"
 
 
