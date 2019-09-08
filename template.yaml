@@ -16,54 +16,54 @@ Globals:
 
 Resources:
 
-    FirstFunction:
+    ExpenseFunction:
         Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
         Properties:
             CodeUri: first_function/build/
             Handler: app.lambda_handler
             Runtime: python3.7 # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
             Events:
-                CatchAll:
+                Post:
                     Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
                     Properties:
-                        Path: /first/{any_argument+}
-                        Method: any 
-            # Policies: # Example inline policy
-            #     - Version: "2012-10-17"
-            #     Statement:
-            #         - Effect: "Allow"
-            #         Action:
-            #             - "ssm:GetParameter"
-            #         Resource:
-            #             - "*"
+                        Path: /reimburse
+                        Method: POST
+                        RestApiId: !Ref ExpenseApi
+            Policies:
+                - AWSLambdaVPCAccessExecutionRole
+                - AmazonDynamoDBFullAccess
+                - Version: '2012-10-17'
+                  Statement:
+                      - Sid: Stmt1467321765000
+                        Effect: Allow
+                        Action:
+                            - apigateway:*
+                        Resource:
+                             - "*"
             Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
                 Variables:
                     PARAM1: VALUE
 
-    # Sample policy to add additional permissions to your Lambda
-    FirstFunctionAdditionalPermission:
-        Type: "AWS::IAM::Policy"
+    ApiGatewayInvokeLambdaPermission:
+        Type: "AWS::Lambda::Permission"
         Properties:
-            PolicyName: "root"
-            PolicyDocument:
-                Version: "2012-10-17"
-                Statement:
-                    -
-                        Effect: "Allow"
-                        Action: "ssm:GetParameters"
-                        Resource: "*"
-            Roles:
-                - !Ref FirstFunctionRole # Sample policy to demonstrate Implicit IAM Role created with SAM
+            Action: lambda:InvokeFunction
+            FunctionName: !GetAtt
+                - ExpenseFunction
+                - Arn
+            Principal: apigateway.amazonaws.com
+            SourceArn: !Join [
+                "", [
+                "arn:aws:execute-api:",
+                {"Ref": "AWS::Region"}, ":",
+                {"Ref": "AWS::AccountId"}, ":",
+                !Ref ExpenseApi, "/*/*/*"
+      ]
+      ]
 
+    ExpenseApi:
+        Type: AWS::Serverless::Api
+        Properties:
+            StageName: stage1
 
-
-Outputs:
-
-    FirstApigwURL:
-      Description: "API Gateway endpoint URL for Prod environment for First Function"
-      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/first/proxy"
-
-    FirstFunction:
-      Description: "First Lambda Function ARN"
-      Value: !GetAtt FirstFunction.Arn
 

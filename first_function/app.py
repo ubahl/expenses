@@ -5,6 +5,15 @@ import os
 # Global variables are reused across execution contexts (if available)
 session = boto3.Session()
 
+# ignore caps
+
+personToEmail = {
+    "Uma Bahl": "ubahl@scu.edu"
+}
+
+personToNumber = {
+    "Uma Bahl": "650-300-9626"
+}
 
 def lambda_handler(event, context):
 
@@ -16,6 +25,19 @@ def lambda_handler(event, context):
     }
 
     body = event['body']
+
+    # get all the information from the HTTP request
+
+    revent = body['event']
+    rperson = body['person']
+    remail = personToEmail[rperson]  # include a check if the wrong name is inputted
+    rnumber = personToNumber[rperson]  # include a check
+    dateOfPurchase = body['dateOfPurchase']
+    totalAmount = body['totalAmount']
+    description = body['description']
+    other = body['other']
+
+
     """
         AWS Lambda handler
         Parameters
