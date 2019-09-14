@@ -11,11 +11,25 @@ dynamodb = boto3.resource('dynamodb')
 # ignore caps
 
 personToEmail = {
-    "Uma Bahl": "ubahl@scu.edu"
+    "Uma Bahl": "ubahl@scu.edu",
+    "Tiana Nguyen": "t25nguyen@scu.edu",
+    "Matthew Zhang": "mlzhang@scu.edu",
+    "Matthew Mistele": "mmistele@scu.edu",
+    "Kade Harmon": "kpharmon@scu.edu",
+    "Philip Cori": "pcori@scu.edu",
+    "Story DeWeese": "sdeweese@scu.edu",
+    "Alexander Kennedy": "akennedy2@scu.edu"
 }
 
 personToNumber = {
-    "Uma Bahl": "650-300-9626"
+    "Uma Bahl": "650-300-9626",
+    "Tiana Nguyen": "408-500-5588",
+    "Matthew Zhang": "775-233-7097",
+    "Matthew Mistele": "‭425-635-8517‬",
+    "Kade Harmon": "925-389-2424",
+    "Philip Cori": "669-777-8180",
+    "Story DeWeese": "423-596-4294",
+    "Alexander Kennedy": "925-915-9124"
 }
 
 def lambda_handler(event, context):
