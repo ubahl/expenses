@@ -2,6 +2,7 @@ import boto3
 import json
 import os
 import datetime
+import ast
 
 # Global variables are reused across execution contexts (if available)
 session = boto3.Session()
@@ -29,6 +30,7 @@ def lambda_handler(event, context):
     }
 
     body = event["body"]
+    body = ast.literal_eval(body)
 
     # get all the information from the HTTP request
 
@@ -40,7 +42,6 @@ def lambda_handler(event, context):
     totalAmount = body["totalAmount"]
     description = body["description"]
     other = body["other"]
-
 
     item = {
         'ReimbursementSeeker': rperson,

@@ -22,7 +22,7 @@ EVENT ?= event_not_defined
 ############# 
 
 NETWORK = ""
-
+ma
 target:
 	$(info ${HELP_MESSAGE})
 	@exit 0

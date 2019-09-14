@@ -1,0 +1,22 @@
+[32mSTART RequestId: 52fdfc07-2182-154f-163f-5f0f9a621d72 Version: $LATEST[0m
+[ERROR] TypeError: string indices must be integersTraceback (most recent call last):  File "/var/task/app.py", line 35, in lambda_handler    revent = body["event"]
+[32mEND RequestId: 52fdfc07-2182-154f-163f-5f0f9a621d72[0m
+[32mREPORT RequestId: 52fdfc07-2182-154f-163f-5f0f9a621d72	Duration: 17.76 ms	Billed Duration: 100 ms	Memory Size: 128 MB	Max Memory Used: 34 MB	[0m
+[31m{
+  "errorType": "TypeError",
+  "errorMessage": "string indices must be integers",
+  "stackTrace": [
+    "  File \"/var/task/app.py\", line 35, in lambda_handler\n    revent = body[\"event\"]\n"
+  ]
+}[0m
+[32mSTART RequestId: 52fdfc07-2182-154f-163f-5f0f9a621d72 Version: $LATEST[0m
+[ERROR] TypeError: string indices must be integersTraceback (most recent call last):  File "/var/task/app.py", line 35, in lambda_handler    revent = body["event"]
+[32mEND RequestId: 52fdfc07-2182-154f-163f-5f0f9a621d72[0m
+[32mREPORT RequestId: 52fdfc07-2182-154f-163f-5f0f9a621d72	Duration: 20.17 ms	Billed Duration: 100 ms	Memory Size: 128 MB	Max Memory Used: 34 MB	[0m
+[31m{
+  "errorType": "TypeError",
+  "errorMessage": "string indices must be integers",
+  "stackTrace": [
+    "  File \"/var/task/app.py\", line 35, in lambda_handler\n    revent = body[\"event\"]\n"
+  ]
+}[0m
