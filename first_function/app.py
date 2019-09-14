@@ -36,32 +36,41 @@ def lambda_handler(event, context):
 
     revent = body["event"]
     rperson = body["person"]
-    remail = personToEmail[rperson]  # include a check if the wrong name is inputted
-    rnumber = personToNumber[rperson]  # include a check
     dateOfPurchase = body["dateOfPurchase"]
     totalAmount = body["totalAmount"]
     description = body["description"]
     other = body["other"]
 
+    try:
+        remail = personToEmail[rperson]
+    except:
+        remail = "not found"
+
+    try:
+        rnumber = personToNumber[rperson]
+    except:
+        remail = "not found"
+
+
     item = {
-        'ReimbursementSeeker': rperson,
-        'DateAdded': str(datetime.datetime.now()),
-        'Reimbursed': "no",
-        'DateOfPurchase': dateOfPurchase,
-        'Email': remail,
-        'Phone': rnumber,
-        'Event': revent,
-        'Description': description,
-        'TotalAmount': totalAmount,
-        'Other': other
+        "ReimbursementSeeker": rperson,
+        "DateAdded": str(datetime.datetime.now()),
+        "Reimbursed": "no",
+        "DateOfPurchase": dateOfPurchase,
+        "Email": remail,
+        "Phone": rnumber,
+        "Event": revent,
+        "Description": description,
+        "TotalAmount": totalAmount,
+        "Other": other
     }
 
     table.put_item(
         Item=item
     )
 
-    response["statusCode"]: 200
-    response["body"]: json.dumps(item)
+    response["statusCode"] = 200
+    response["body"] = json.dumps(item)
 
     return response
 
