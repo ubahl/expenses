@@ -1,0 +1,63 @@
+openapi: 3.0.0
+info:
+  version: "1.0.0"
+  title: "Expense API"
+paths:
+  /reimburse:
+    post:
+      description: Puts in the reimbursement request
+      requestBody:
+        description: the reimbursement details
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                event:
+                  type: string
+                person:
+                  type: string
+                dateOfPurchase:
+                  type: string
+                totalAmount:
+                  type: string
+                description:
+                  type: string
+                other:
+                  type: string
+              required:
+                - event
+                - person
+                - dateOfPurchase
+                - totalAmount
+                - description
+
+      responses:
+        '200':
+          description: Returns a summary of what is added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  body:
+                    type: string
+                  headers:
+                    type: string
+                    example: {'header':'value'}
+                  statusCode:
+                    type: integer
+                  isBase64Encoded:
+                    type: boolean
+        '400':
+          description: Invalid characters in "user" were provided.
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: 200
+        uri:
+          Sub! "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ExpenseFunction.Arn}/invocations"
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy

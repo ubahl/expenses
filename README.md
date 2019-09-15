@@ -1,6 +1,8 @@
 # acm-expenses
 
-keep track of all acm expenses 
+Keep track of SCU ACM's expenses 
+
+Front end available at [umabahl.com](http://umabahl.com/)
 
 ## Requirements
 

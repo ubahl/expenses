@@ -34,6 +34,8 @@ personToNumber = {
 
 def lambda_handler(event, context):
 
+    print("event ", event)
+
     table = dynamodb.Table('ReimbursementsTable')
 
     response = {
@@ -44,7 +46,13 @@ def lambda_handler(event, context):
     }
 
     body = event["body"]
-    body = ast.literal_eval(body)
+
+    print("type ", type(body))
+    print("body ", body)
+
+    body = json.loads(body)
+
+    print("loads ", body)
 
     # get all the information from the HTTP request
 
@@ -82,6 +90,8 @@ def lambda_handler(event, context):
     table.put_item(
         Item=item
     )
+
+    print(item)
 
     response["statusCode"] = 200
     response["body"] = json.dumps(item)
