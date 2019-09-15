@@ -3,6 +3,7 @@ import json
 import os
 import datetime
 import ast
+from urllib.parse import parse_qs
 
 # Global variables are reused across execution contexts (if available)
 session = boto3.Session()
@@ -32,8 +33,8 @@ personToNumber = {
     "Alexander Kennedy": "925-915-9124"
 }
 
-def lambda_handler(event, context):
 
+def lambda_handler(event, context):
     print("event ", event)
 
     table = dynamodb.Table('ReimbursementsTable')
@@ -50,18 +51,22 @@ def lambda_handler(event, context):
     print("type ", type(body))
     print("body ", body)
 
-    body = json.loads(body)
+    body = parse_qs(body)
 
-    print("loads ", body)
+    print("parsed ", body)
 
     # get all the information from the HTTP request
 
-    revent = body["event"]
-    rperson = body["person"]
-    dateOfPurchase = body["dateOfPurchase"]
-    totalAmount = body["totalAmount"]
-    description = body["description"]
-    other = body["other"]
+    revent = body["event"][0]
+    rperson = body["person"][0]
+    dateOfPurchase = body["dateOfPurchase"][0]
+    totalAmount = body["totalAmount"][0]
+    description = body["desciption"][0]
+
+    try:
+        other = body["other"][0]
+    except:
+        other = "no other details"
 
     try:
         remail = personToEmail[rperson]
@@ -71,8 +76,7 @@ def lambda_handler(event, context):
     try:
         rnumber = personToNumber[rperson]
     except:
-        remail = "not found"
-
+        rnumber = "not found"
 
     item = {
         "ReimbursementSeeker": rperson,
