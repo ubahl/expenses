@@ -42,7 +42,7 @@ def lambda_handler(event, context):
     response = {
         "isBase64Encoded": True,
         "statusCode": 0,
-        "headers": {"headerName": "headerValue"},
+        "headers": {"Access-Control-Allow-Origin": "http://umabahl.com"},
         "body": ""
     }
 
@@ -100,5 +100,5 @@ def lambda_handler(event, context):
     response["statusCode"] = 200
     response["body"] = json.dumps(item)
 
-    return response
+    return "Your response has been recorded. Here is the information Uma Bahl Reimbursement Co. has received: \n {}".format(response)
 

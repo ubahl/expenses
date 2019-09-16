@@ -11,7 +11,7 @@ Resources:
   ExpenseFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://sam-bucket-2/f55fd0679a54873120edde5dbb273743
+      CodeUri: s3://sam-bucket-2/c0b08261ca7b427413b65a6554e0c07c
       Handler: app.lambda_handler
       Runtime: python3.7
       Events:
@@ -57,6 +57,9 @@ Resources:
     Properties:
       StageName: stage1
       EndpointConfiguration: REGIONAL
+      Cors:
+        AllowMethods: POST
+        AllowOrigin: http://umabahl.com
       DefinitionBody:
         openapi: 3.0.0
         info:
@@ -94,7 +97,7 @@ Resources:
                       - description
               responses:
                 '200':
-                  description: Returns a summary of what is added
+                  description: Returns the result from Comprehend
                   content:
                     application/json:
                       schema:
@@ -116,6 +119,8 @@ Resources:
                 responses:
                   default:
                     statusCode: 200
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: http://umabahl.com
                 uri:
                   Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ExpenseFunction.Arn}/invocations
                 passthroughBehavior: when_no_match

@@ -64,6 +64,9 @@ Resources:
         Properties:
             StageName: stage1
             EndpointConfiguration: REGIONAL
+            Cors:
+                AllowMethods: POST
+                AllowOrigin: http://umabahl.com
             DefinitionBody:
                 openapi: 3.0.0
                 info:
@@ -102,7 +105,7 @@ Resources:
 
                             responses:
                                 '200':
-                                    description: Returns a summary of what is added
+                                    description: Returns the result from Comprehend
                                     content:
                                         application/json:
                                             schema:
@@ -123,6 +126,8 @@ Resources:
                                 responses:
                                     default:
                                         statusCode: 200
+                                        responseParameters:
+                                            method.response.header.Access-Control-Allow-Origin: "http://umabahl.com"
                                 uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ExpenseFunction.Arn}/invocations"
                                 passthroughBehavior: when_no_match
                                 httpMethod: POST
