@@ -37,7 +37,8 @@ personToNumber = {
 def lambda_handler(event, context):
     print("event ", event)
 
-    table = dynamodb.Table('ReimbursementsTable')
+    tablename = os.environ['TABLE_NAME']
+    table = dynamodb.Table(tablename)
 
     response = {
         "isBase64Encoded": True,

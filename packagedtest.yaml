@@ -1,0 +1,146 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: "acm-expenses\nkeep track of all acm expenses \n"
+Globals:
+  Function:
+    Timeout: 5
+    AutoPublishAlias: live
+    DeploymentPreference:
+      Type: Linear10PercentEvery1Minute
+Resources:
+  ExpenseFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-bucket-2/bbb56de46f2db859dbc3623ffc0ddd42
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: DynamoDBTable
+      Events:
+        Post:
+          Type: Api
+          Properties:
+            Path: /reimburse
+            Method: POST
+            RestApiId:
+              Ref: ExpenseApi
+      Policies:
+      - AWSLambdaVPCAccessExecutionRole
+      - AmazonDynamoDBFullAccess
+      - Version: '2012-10-17'
+        Statement:
+        - Sid: Stmt1467321765000
+          Effect: Allow
+          Action:
+          - apigateway:*
+          Resource:
+          - '*'
+  ApiGatewayInvokeLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+        - ExpenseFunction
+        - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+        - ''
+        - - 'arn:aws:execute-api:'
+          - Ref: AWS::Region
+          - ':'
+          - Ref: AWS::AccountId
+          - ':'
+          - Ref: ExpenseApi
+          - /*/*/*
+  ExpenseApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: stage1
+      EndpointConfiguration: REGIONAL
+      Cors:
+        AllowMethods: POST
+        AllowOrigin: http://umabahl.com
+      DefinitionBody:
+        openapi: 3.0.0
+        info:
+          version: 1.0.0
+          title: Expense API
+        paths:
+          /reimburse:
+            post:
+              description: Puts in the reimbursement request
+              requestBody:
+                description: the reimbursement details
+                required: true
+                content:
+                  application/x-www-form-urlencoded:
+                    schema:
+                      type: object
+                      properties:
+                        event:
+                          type: string
+                        person:
+                          type: string
+                        dateOfPurchase:
+                          type: string
+                        totalAmount:
+                          type: string
+                        description:
+                          type: string
+                        other:
+                          type: string
+                      required:
+                      - event
+                      - person
+                      - dateOfPurchase
+                      - totalAmount
+                      - description
+              responses:
+                '200':
+                  description: Returns the result from Comprehend
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          body:
+                            type: string
+                          headers:
+                            type: string
+                            example:
+                              header: value
+                          statusCode:
+                            type: integer
+                          isBase64Encoded:
+                            type: boolean
+                '400':
+                  description: Invalid characters in "user" were provided.
+              x-amazon-apigateway-integration:
+                responses:
+                  default:
+                    statusCode: 200
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ExpenseFunction.Arn}/invocations
+                passthroughBehavior: when_no_match
+                httpMethod: POST
+                type: aws_proxy
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: ReimbursementSeeker
+        AttributeType: S
+      - AttributeName: DateAdded
+        AttributeType: S
+      KeySchema:
+      - AttributeName: ReimbursementSeeker
+        KeyType: HASH
+      - AttributeName: DateAdded
+        KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: '10'
+        WriteCapacityUnits: '10'
