@@ -22,6 +22,9 @@ Resources:
             CodeUri: ./first_function # .aws-sam/build/template.yaml  # first_function/build/
             Handler: app.lambda_handler
             Runtime: python3.7 # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
+            Environment:
+                Variables:
+                    TABLE_NAME: !Ref DynamoDBTable
             Events:
                 Post:
                     Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -64,6 +67,8 @@ Resources:
         Properties:
             StageName: stage1
             EndpointConfiguration: REGIONAL
+            Cors:
+                AllowOrigin: "'http://umabahl.com'"
             DefinitionBody:
                 openapi: 3.0.0
                 info:
@@ -102,7 +107,7 @@ Resources:
 
                             responses:
                                 '200':
-                                    description: Returns a summary of what is added
+                                    description: Returns the result from Comprehend
                                     content:
                                         application/json:
                                             schema:
@@ -127,11 +132,9 @@ Resources:
                                 passthroughBehavior: when_no_match
                                 httpMethod: POST
                                 type: aws_proxy
-
     DynamoDBTable:
         Type: AWS::DynamoDB::Table
         Properties:
-            TableName: "ReimbursementsTable"
             AttributeDefinitions:
                 - AttributeName: "ReimbursementSeeker"
                   AttributeType: "S"

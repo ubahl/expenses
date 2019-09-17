@@ -37,12 +37,13 @@ personToNumber = {
 def lambda_handler(event, context):
     print("event ", event)
 
-    table = dynamodb.Table('ReimbursementsTable')
+    tablename = os.environ['TABLE_NAME']
+    table = dynamodb.Table(tablename)
 
     response = {
         "isBase64Encoded": True,
         "statusCode": 0,
-        "headers": {"headerName": "headerValue"},
+        "headers": {"Access-Control-Allow-Origin": "http://umabahl.com"},
         "body": ""
     }
 
@@ -56,6 +57,10 @@ def lambda_handler(event, context):
     print("parsed ", body)
 
     # get all the information from the HTTP request
+    if len(body) < 5:
+        response["statusCode"] = 200
+        response["body"] = "invalid attempt"
+        return response
 
     revent = body["event"][0]
     rperson = body["person"][0]
@@ -98,7 +103,7 @@ def lambda_handler(event, context):
     print(item)
 
     response["statusCode"] = 200
-    response["body"] = json.dumps(item)
+    response["body"] = "Your response has been recorded. Here is the information Uma Bahl Reimbursement Co. has received: \n {}".format(item)
 
     return response
 
