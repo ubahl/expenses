@@ -11,7 +11,7 @@ Resources:
   ExpenseFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://sam-bucket-2/bbb56de46f2db859dbc3623ffc0ddd42
+      CodeUri: s3://sam-bucket-2/af3f07db831d026ea5e8a18ee4e5ccfb
       Handler: app.lambda_handler
       Runtime: python3.7
       Environment:
@@ -62,8 +62,7 @@ Resources:
       StageName: stage1
       EndpointConfiguration: REGIONAL
       Cors:
-        AllowMethods: POST
-        AllowOrigin: http://umabahl.com
+        AllowOrigin: '''http://umabahl.com'''
       DefinitionBody:
         openapi: 3.0.0
         info:
