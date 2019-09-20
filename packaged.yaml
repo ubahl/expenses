@@ -11,9 +11,13 @@ Resources:
   ExpenseFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://sam-bucket-2/06703631686702f8fc73b1d5684321f8
+      CodeUri: s3://sam-bucket-2/7ca745a8f0c9860422d726c671172fbe
       Handler: app.lambda_handler
       Runtime: python3.7
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: DynamoDBTable
       Events:
         Post:
           Type: Api
@@ -58,8 +62,7 @@ Resources:
       StageName: stage1
       EndpointConfiguration: REGIONAL
       Cors:
-        AllowMethods: POST
-        AllowOrigin: http://umabahl.com
+        AllowOrigin: '''http://umabahl.com'''
       DefinitionBody:
         openapi: 3.0.0
         info:
@@ -119,8 +122,6 @@ Resources:
                 responses:
                   default:
                     statusCode: 200
-                    responseParameters:
-                      method.response.header.Access-Control-Allow-Origin: http://umabahl.com
                 uri:
                   Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ExpenseFunction.Arn}/invocations
                 passthroughBehavior: when_no_match
@@ -129,7 +130,6 @@ Resources:
   DynamoDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: ReimbursementsTable
       AttributeDefinitions:
       - AttributeName: ReimbursementSeeker
         AttributeType: S

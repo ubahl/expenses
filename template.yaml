@@ -25,6 +25,7 @@ Resources:
             Environment:
                 Variables:
                     TABLE_NAME: !Ref DynamoDBTable
+                    POLICY_ARN: !Ref SESAuthorizationPolicy
             Events:
                 Post:
                     Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -44,6 +45,17 @@ Resources:
                             - apigateway:*
                         Resource:
                              - "*"
+                - Id: SESAuthorizationPolicy
+                  Version: '2012-10-17'
+                  Statement:
+                      - Sid: AuthorizeService
+                        Effect: Allow
+                        Resource: "arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/umabahl.com"
+                        Principal:
+                            Service:
+                                - lambda.amazonaws.com
+                        Action:
+                            - SES:SendEmail
 
     ApiGatewayInvokeLambdaPermission:
         Type: "AWS::Lambda::Permission"

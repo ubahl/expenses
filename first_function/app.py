@@ -8,6 +8,7 @@ from urllib.parse import parse_qs
 # Global variables are reused across execution contexts (if available)
 session = boto3.Session()
 dynamodb = boto3.resource('dynamodb')
+client = boto3.client()
 
 # ignore caps
 
@@ -104,6 +105,42 @@ def lambda_handler(event, context):
 
     response["statusCode"] = 200
     response["body"] = "Your response has been recorded. Here is the information Uma Bahl Reimbursement Co. has received: \n {}".format(item)
+    sendemail(item)
 
     return response
+
+
+def sendemail(item):
+    response = client.send(
+        Source="reimbursement@umabahl.com",
+        Destination={
+            "toAddresses": [
+                "ubahl@scu.edu",
+                item["Email"]
+            ]
+        },
+        Message={
+            "Subject": {
+                "Data": "Summary of Your Reimbursement"
+            },
+            "Body": {
+                "Text": {
+                    "Data": ("Dear {}, \n \n"
+                             "Here is a summary of your recent reimbursement \n"
+                             "Total Amount: {} \n"
+                             "Event: {} \n"
+                             "Description: {} \n"
+                             "Date of Purchase: {} \n"
+                             "Other: {} \n"
+                             "Don't forget to send a copy of the receipt! \n \n"
+                             ).format(item["ReimbursementSeeker"], item["TotalAmount"], item["Event"], item["Description"], item["DateOfPurchase"], item["Other"])
+                }
+            }
+        },
+        SourceArn=os.environ['POLICY_ARN']
+    )
+
+    print(response)
+
+
 
