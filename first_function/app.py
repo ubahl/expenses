@@ -126,13 +126,15 @@ def sendemail(item):
             "Body": {
                 "Text": {
                     "Data": ("Dear {}, \n \n"
-                             "Here is a summary of your recent reimbursement \n"
+                             "Here is a summary of your recent reimbursement: \n \n"
                              "Total Amount: {} \n"
                              "Event: {} \n"
                              "Description: {} \n"
                              "Date of Purchase: {} \n"
                              "Other: {} \n \n"
-                             "Don't forget to send a copy of the receipt! \n"
+                             "Don't forget to send a copy of the receipt! \n \n"
+                             "Best, \n"
+                             "Your Neighborhood Treasurer"
                              ).format(item["ReimbursementSeeker"], item["TotalAmount"], item["Event"], item["Description"], item["DateOfPurchase"], item["Other"])
                 }
             }
