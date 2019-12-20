@@ -72,6 +72,11 @@ def lambda_handler(event, context):
         return response
 
     try:
+        asgfunding = body["asgfunding"][0]
+    except:
+        asgfunding = "unknown"
+
+    try:
         other = body["other"][0]
     except:
         other = "no other details"
@@ -96,6 +101,7 @@ def lambda_handler(event, context):
         "Event": revent,
         "Description": description,
         "TotalAmount": totalAmount,
+        "ASGFunding": asgfunding,
         "Other": other
     }
 
@@ -134,11 +140,12 @@ def sendemail(item):
                              "Event: {} \n"
                              "Description: {} \n"
                              "Date of Purchase: {} \n"
+                             "ASG Funding Received: {} \n"
                              "Other: {} \n \n"
                              "Don't forget to send a copy of the receipt! \n \n"
                              "Best, \n"
                              "Your Automated Treasurer"
-                             ).format(item["ReimbursementSeeker"], item["TotalAmount"], item["Event"], item["Description"], item["DateOfPurchase"], item["Other"])
+                             ).format(item["ReimbursementSeeker"], item["TotalAmount"], item["Event"], item["Description"], item["DateOfPurchase"], item["ASGFunding"], item["Other"])
                 }
             }
         },

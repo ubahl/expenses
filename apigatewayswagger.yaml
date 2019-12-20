@@ -24,6 +24,8 @@ paths:
                   type: string
                 description:
                   type: string
+                asgfunding:
+                  type: string
                 other:
                   type: string
               required:
