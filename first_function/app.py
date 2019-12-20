@@ -58,11 +58,8 @@ def lambda_handler(event, context):
     print("parsed ", body)
 
     # get all the information from the HTTP request
-    # if len(body) < 5:
-    #     response["statusCode"] = 200
-    #     response["body"] = "invalid attempt"
-    #     return response
 
+    # make sure the input is valid, otherwise return
     try:
         revent = body["event"][0]
         rperson = body["person"][0]
@@ -119,12 +116,10 @@ def sendemail(item):
     response = sesclient.send_email(
         Source="reimbursement@umabahl.com",
         Destination={
-            # "ToAddresses": [
-            #     "ubahl@scu.edu",
-            #     item["Email"]
-            # ]
             "ToAddresses": [
                 "ubahl@scu.edu"
+                # item["Email"]
+                # add this line once limit increase is approved
             ]
         },
         Message={
@@ -142,7 +137,7 @@ def sendemail(item):
                              "Other: {} \n \n"
                              "Don't forget to send a copy of the receipt! \n \n"
                              "Best, \n"
-                             "Your Neighborhood Treasurer"
+                             "Your Automated Treasurer"
                              ).format(item["ReimbursementSeeker"], item["TotalAmount"], item["Event"], item["Description"], item["DateOfPurchase"], item["Other"])
                 }
             }
