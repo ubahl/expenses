@@ -8,6 +8,7 @@ from urllib.parse import parse_qs
 # Global variables are reused across execution contexts (if available)
 session = boto3.Session()
 dynamodb = boto3.resource('dynamodb')
+sesclient = boto3.client('ses')
 
 # ignore caps
 
@@ -57,16 +58,23 @@ def lambda_handler(event, context):
     print("parsed ", body)
 
     # get all the information from the HTTP request
-    if len(body) < 5:
+
+    # make sure the input is valid, otherwise return
+    try:
+        revent = body["event"][0]
+        rperson = body["person"][0]
+        dateOfPurchase = body["dateOfPurchase"][0]
+        totalAmount = body["totalAmount"][0]
+        description = body["desciption"][0]
+    except:
         response["statusCode"] = 200
         response["body"] = "invalid attempt"
         return response
 
-    revent = body["event"][0]
-    rperson = body["person"][0]
-    dateOfPurchase = body["dateOfPurchase"][0]
-    totalAmount = body["totalAmount"][0]
-    description = body["desciption"][0]
+    try:
+        asgfunding = body["asgfunding"][0]
+    except:
+        asgfunding = "unknown"
 
     try:
         other = body["other"][0]
@@ -93,6 +101,7 @@ def lambda_handler(event, context):
         "Event": revent,
         "Description": description,
         "TotalAmount": totalAmount,
+        "ASGFunding": asgfunding,
         "Other": other
     }
 
@@ -104,6 +113,46 @@ def lambda_handler(event, context):
 
     response["statusCode"] = 200
     response["body"] = "Your response has been recorded. Here is the information Uma Bahl Reimbursement Co. has received: \n {}".format(item)
+    sendemail(item)
 
     return response
+
+
+def sendemail(item):
+    response = sesclient.send_email(
+        Source="reimbursement@umabahl.com",
+        Destination={
+            "ToAddresses": [
+                "ubahl@scu.edu"
+                # item["Email"]
+                # add this line once limit increase is approved
+            ]
+        },
+        Message={
+            "Subject": {
+                "Data": "Summary of Your Reimbursement"
+            },
+            "Body": {
+                "Text": {
+                    "Data": ("Dear {}, \n \n"
+                             "Here is a summary of your recent reimbursement: \n \n"
+                             "Total Amount: {} \n"
+                             "Event: {} \n"
+                             "Description: {} \n"
+                             "Date of Purchase: {} \n"
+                             "ASG Funding Received: {} \n"
+                             "Other: {} \n \n"
+                             "Don't forget to send a copy of the receipt! \n \n"
+                             "Best, \n"
+                             "Your Automated Treasurer"
+                             ).format(item["ReimbursementSeeker"], item["TotalAmount"], item["Event"], item["Description"], item["DateOfPurchase"], item["ASGFunding"], item["Other"])
+                }
+            }
+        },
+        # SourceArn=os.environ['POLICY_ARN']
+    )
+
+    print(response)
+
+
 
