@@ -58,16 +58,21 @@ def lambda_handler(event, context):
     print("parsed ", body)
 
     # get all the information from the HTTP request
-    if len(body) < 5:
+    # if len(body) < 5:
+    #     response["statusCode"] = 200
+    #     response["body"] = "invalid attempt"
+    #     return response
+
+    try:
+        revent = body["event"][0]
+        rperson = body["person"][0]
+        dateOfPurchase = body["dateOfPurchase"][0]
+        totalAmount = body["totalAmount"][0]
+        description = body["desciption"][0]
+    except:
         response["statusCode"] = 200
         response["body"] = "invalid attempt"
         return response
-
-    revent = body["event"][0]
-    rperson = body["person"][0]
-    dateOfPurchase = body["dateOfPurchase"][0]
-    totalAmount = body["totalAmount"][0]
-    description = body["desciption"][0]
 
     try:
         other = body["other"][0]
@@ -114,9 +119,12 @@ def sendemail(item):
     response = sesclient.send_email(
         Source="reimbursement@umabahl.com",
         Destination={
+            # "ToAddresses": [
+            #     "ubahl@scu.edu",
+            #     item["Email"]
+            # ]
             "ToAddresses": [
-                "ubahl@scu.edu",
-                item["Email"]
+                "ubahl@scu.edu"
             ]
         },
         Message={
