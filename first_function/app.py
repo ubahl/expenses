@@ -2,8 +2,9 @@ import boto3
 import json
 import os
 import datetime
-import ast
 from urllib.parse import parse_qs
+from requests_toolbelt import MultipartDecoder
+
 
 # Global variables are reused across execution contexts (if available)
 session = boto3.Session()
@@ -50,67 +51,84 @@ def lambda_handler(event, context):
 
     body = event["body"]
 
-    print("type ", type(body))
-    print("body ", body)
+    print(body)
 
-    body = parse_qs(body)
+    multipart_data = MultipartDecoder.from_response(body)
 
-    print("parsed ", body)
+    print(multipart_data)
 
-    # get all the information from the HTTP request
-    if len(body) < 5:
-        response["statusCode"] = 200
-        response["body"] = "invalid attempt"
-        return response
+    for part in multipart_data.parts:
+        print(part.content)  # Alternatively, part.text if you want unicode
+        print(part.headers)
 
-    revent = body["event"][0]
-    rperson = body["person"][0]
-    dateOfPurchase = body["dateOfPurchase"][0]
-    totalAmount = body["totalAmount"][0]
-    description = body["desciption"][0]
-
-    try:
-        other = body["other"][0]
-    except:
-        other = "no other details"
-
-    try:
-        remail = personToEmail[rperson]
-    except:
-        remail = "not found"
-
-    try:
-        rnumber = personToNumber[rperson]
-    except:
-        rnumber = "not found"
-
-    item = {
-        "ReimbursementSeeker": rperson,
-        "DateAdded": str(datetime.datetime.now()),
-        "Reimbursed": "no",
-        "DateOfPurchase": dateOfPurchase,
-        "Email": remail,
-        "Phone": rnumber,
-        "Event": revent,
-        "Description": description,
-        "TotalAmount": totalAmount,
-        "Other": other
-    }
-
-    table.put_item(
-        Item=item
-    )
-
-    print(item)
-
-    response["statusCode"] = 200
-    response["body"] = "Your response has been recorded. Here is the information Uma Bahl Reimbursement Co. has received: \n {}".format(item)
-    sendemail(item)
+    response['statusCode'] = 200
+    response['body'] = 'done testing'
 
     return response
 
+    #
+    #
+    # print("type ", type(body))
+    # print("body ", body)
+    #
+    # body = parse_qs(body)
+    #
+    # print("parsed ", body)
+    #
+    # # get all the information from the HTTP request
+    # if len(body) < 5:
+    #     response["statusCode"] = 200
+    #     response["body"] = "invalid attempt"
+    #     return response
+    #
+    # revent = body["event"][0]
+    # rperson = body["person"][0]
+    # dateOfPurchase = body["dateOfPurchase"][0]
+    # totalAmount = body["totalAmount"][0]
+    # description = body["desciption"][0]
+    #
+    # try:
+    #     other = body["other"][0]
+    # except:
+    #     other = "no other details"
+    #
+    # try:
+    #     remail = personToEmail[rperson]
+    # except:
+    #     remail = "not found"
+    #
+    # try:
+    #     rnumber = personToNumber[rperson]
+    # except:
+    #     rnumber = "not found"
+    #
+    # item = {
+    #     "ReimbursementSeeker": rperson,
+    #     "DateAdded": str(datetime.datetime.now()),
+    #     "Reimbursed": "no",
+    #     "DateOfPurchase": dateOfPurchase,
+    #     "Email": remail,
+    #     "Phone": rnumber,
+    #     "Event": revent,
+    #     "Description": description,
+    #     "TotalAmount": totalAmount,
+    #     "Other": other
+    # }
+    #
+    # table.put_item(
+    #     Item=item
+    # )
+    #
+    # print(item)
+    #
+    # response["statusCode"] = 200
+    # response["body"] = "Your response has been recorded. Here is the information Uma Bahl Reimbursement Co. has received: \n {}".format(item)
+    # sendemail(item)
+    #
+    # return response
 
-def sendemail(item):
+
+def sendemail(item, receipt):
     response = sesclient.send_email(
         Source="reimbursement@umabahl.com",
         Destination={
@@ -124,7 +142,7 @@ def sendemail(item):
                 "Data": "Summary of Your Reimbursement"
             },
             "Body": {
-                "Text": {
+                "Html": {
                     "Data": ("Dear {}, \n \n"
                              "Here is a summary of your recent reimbursement: \n \n"
                              "Total Amount: {} \n"
@@ -132,10 +150,12 @@ def sendemail(item):
                              "Description: {} \n"
                              "Date of Purchase: {} \n"
                              "Other: {} \n \n"
-                             "Don't forget to send a copy of the receipt! \n \n"
+                             "Receipt: \n"
+                             '<img src="data:image/jpg;base64, {}" />'
+                             "\n \n"
                              "Best, \n"
                              "Your Neighborhood Treasurer"
-                             ).format(item["ReimbursementSeeker"], item["TotalAmount"], item["Event"], item["Description"], item["DateOfPurchase"], item["Other"])
+                             ).format(item["ReimbursementSeeker"], item["TotalAmount"], item["Event"], item["Description"], item["DateOfPurchase"], item["Other"], receipt)
                 }
             }
         },

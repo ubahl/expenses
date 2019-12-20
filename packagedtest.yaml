@@ -11,7 +11,7 @@ Resources:
   ExpenseFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://sam-bucket-2/a357707f025af41b466f2dbb5e18e05f
+      CodeUri: s3://sam-bucket-2/228543f0c82c397496a2ddaf29834e29
       Handler: app.lambda_handler
       Runtime: python3.7
       Environment:
@@ -85,7 +85,7 @@ Resources:
                 description: the reimbursement details
                 required: true
                 content:
-                  application/x-www-form-urlencoded:
+                  multipart/form-data:
                     schema:
                       type: object
                       properties:
@@ -101,12 +101,16 @@ Resources:
                           type: string
                         other:
                           type: string
+                        receipt:
+                          type: string
+                          format: base64
                       required:
                       - event
                       - person
                       - dateOfPurchase
                       - totalAmount
                       - description
+                      - receipt
               responses:
                 '200':
                   description: Returns the result from Comprehend

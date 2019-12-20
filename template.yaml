@@ -96,7 +96,7 @@ Resources:
                                 description: the reimbursement details
                                 required: true
                                 content:
-                                    application/x-www-form-urlencoded:
+                                    multipart/form-data:
                                         schema:
                                             type: object
                                             properties:
@@ -112,12 +112,16 @@ Resources:
                                                     type: string
                                                 other:
                                                     type: string
+                                                receipt:
+                                                    type: string
+                                                    format: base64
                                             required:
                                                 - event
                                                 - person
                                                 - dateOfPurchase
                                                 - totalAmount
                                                 - description
+                                                - receipt
 
                             responses:
                                 '200':
