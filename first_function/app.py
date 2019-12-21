@@ -146,7 +146,7 @@ def sendemail(item):
                              "Other: {} \n \n"
                              "Don't forget to send a copy of the receipt! \n \n"
                              "Best, \n"
-                             "Your Automated Treasurer"
+                             "Your AWS Treasurer"
                              ).format(item["ReimbursementSeeker"], item["TotalAmount"], item["Event"], item["Description"], item["DateOfPurchase"], item["ASGFunding"], item["Other"])
                 }
             }
