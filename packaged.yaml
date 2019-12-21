@@ -11,7 +11,7 @@ Resources:
   ExpenseFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://sam-bucket-2/7ca745a8f0c9860422d726c671172fbe
+      CodeUri: s3://sam-bucket-2/da85b29ecfd29d10799d9399625195bd
       Handler: app.lambda_handler
       Runtime: python3.7
       Environment:
@@ -30,6 +30,7 @@ Resources:
       - AWSLambdaVPCAccessExecutionRole
       - AmazonDynamoDBFullAccess
       - Version: '2012-10-17'
+        Id: APIgatewayPolicy
         Statement:
         - Sid: Stmt1467321765000
           Effect: Allow
@@ -37,6 +38,14 @@ Resources:
           - apigateway:*
           Resource:
           - '*'
+      - Id: SESAuthorizationPolicy
+        Version: '2012-10-17'
+        Statement:
+        - Sid: AuthorizeService
+          Effect: Allow
+          Resource: '*'
+          Action:
+          - SES:SendEmail
   ApiGatewayInvokeLambdaPermission:
     Type: AWS::Lambda::Permission
     Properties:
@@ -89,6 +98,8 @@ Resources:
                         totalAmount:
                           type: string
                         description:
+                          type: string
+                        asgfunding:
                           type: string
                         other:
                           type: string

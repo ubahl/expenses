@@ -13,6 +13,7 @@ sesclient = boto3.client('ses')
 # ignore caps
 
 personToEmail = {
+    "test": "hi.hello205@gmail.com",
     "Uma Bahl": "ubahl@scu.edu",
     "Tiana Nguyen": "t25nguyen@scu.edu",
     "Matthew Zhang": "mlzhang@scu.edu",
@@ -123,9 +124,10 @@ def sendemail(item):
         Source="reimbursement@umabahl.com",
         Destination={
             "ToAddresses": [
+                item["Email"]
+            ],
+            "CcAddresses": [
                 "ubahl@scu.edu"
-                # item["Email"]
-                # add this line once limit increase is approved
             ]
         },
         Message={
@@ -144,7 +146,7 @@ def sendemail(item):
                              "Other: {} \n \n"
                              "Don't forget to send a copy of the receipt! \n \n"
                              "Best, \n"
-                             "Your Automated Treasurer"
+                             "Your AWS Treasurer"
                              ).format(item["ReimbursementSeeker"], item["TotalAmount"], item["Event"], item["Description"], item["DateOfPurchase"], item["ASGFunding"], item["Other"])
                 }
             }
