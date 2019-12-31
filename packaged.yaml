@@ -11,7 +11,7 @@ Resources:
   ExpenseFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://sam-bucket-2/dac2561a3a592fcbd6592cb155a60416
+      CodeUri: s3://sam-bucket-2/a4dffc4f7e7aaa6cac6d9ef85e53f5c7
       Handler: app.lambda_handler
       Runtime: python3.7
       Environment:
