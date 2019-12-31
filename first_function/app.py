@@ -120,16 +120,26 @@ def lambda_handler(event, context):
 
 
 def sendemail(item):
-    response = sesclient.send_email(
-        Source="reimbursement@umabahl.com",
-        Destination={
+
+    if (item["Email"] == "not found"):
+        dest = {
+            "ToAddresses": [
+                "ubahl@scu.edu"
+            ]
+        }
+    else:
+        dest = {
             "ToAddresses": [
                 item["Email"]
             ],
             "CcAddresses": [
                 "ubahl@scu.edu"
             ]
-        },
+        }
+
+    response = sesclient.send_email(
+        Source="reimbursement@umabahl.com",
+        Destination=dest,
         Message={
             "Subject": {
                 "Data": "Summary of Your Reimbursement"
